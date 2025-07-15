@@ -1,0 +1,310 @@
+# Variant Calling Pipeline Configuration
+# This file contains all configuration parameters for the variant calling pipeline
+
+# Pipeline Settings
+pipeline:
+  name: "GATK Best Practices Variant Calling Pipeline"
+  version: "1.0.0"
+  description: "Complete variant calling pipeline following GATK best practices"
+  
+  # Output settings
+  output:
+    create_reports: true
+    create_logs: true
+    compress_intermediate: true
+    cleanup_intermediate: false
+    
+  # Performance settings
+  performance:
+    max_memory_gb: 8
+    max_threads: 4
+    chunk_size: 1000000
+    parallel_processing: true
+
+# Tool Paths
+tools:
+  gatk_path: "/usr/local/bin/gatk"
+  bwa_path: "/usr/local/bin/bwa"
+  samtools_path: "/usr/local/bin/samtools"
+  fastqc_path: "/usr/local/bin/fastqc"
+  cutadapt_path: "/usr/local/bin/cutadapt"
+  trimmomatic_path: "/usr/local/bin/trimmomatic"
+
+# Preprocessing Settings
+preprocessing:
+  quality_control:
+    fastqc:
+      threads: 4
+      quiet: true
+      create_reports: true
+      
+  adapter_trimming:
+    cutadapt:
+      quality_cutoff: "20,20"
+      minimum_length: 50
+      adapter_sequences:
+        - "AGATCGGAAGAGC"  # Illumina adapter
+        - "GATCGGAAGAGC"   # Alternative adapter
+      cores: 4
+      
+  quality_trimming:
+    trimmomatic:
+      leading_quality: 3
+      trailing_quality: 3
+      sliding_window: "4:20"
+      min_length: 50
+      threads: 4
+
+# Alignment Settings
+alignment:
+  bwa:
+    algorithm: "mem"
+    threads: 4
+    mark_shorter_splits: true
+    read_group: "@RG\\tID:sample\\tSM:sample\\tPL:ILLUMINA"
+    verbosity: 1
+    
+  sam_processing:
+    samtools:
+      threads: 4
+      compression_level: 6
+      create_index: true
+
+# Post-processing Settings
+postprocessing:
+  deduplication:
+    mark_duplicates:
+      create_index: true
+      validation_stringency: "SILENT"
+      remove_duplicates: false
+      
+  base_recalibration:
+    base_recalibrator:
+      known_sites: []  # Will be populated with actual paths
+      memory: 8
+      
+    apply_bqsr:
+      create_index: true
+      memory: 8
+
+# Variant Calling Settings
+variant_calling:
+  haplotype_caller:
+    emit_ref_confidence: "GVCF"
+    native_pair_hmm_threads: 4
+    max_reads_per_alignment_start: 50
+    min_base_quality_score: 10
+    min_mapping_quality: 20
+    standard_min_confidence_threshold_for_calling: 30.0
+    standard_min_confidence_threshold_for_emitting: 30.0
+    use_parallel: true
+    use_gvcf: true
+    
+  variant_filtering:
+    snp_filters:
+      qd_threshold: 2.0
+      fs_threshold: 60.0
+      sor_threshold: 3.0
+      mq_threshold: 40.0
+      mq_ranksum_threshold: -12.5
+      read_pos_ranksum_threshold: -8.0
+      
+    indel_filters:
+      qd_threshold: 2.0
+      fs_threshold: 200.0
+      sor_threshold: 10.0
+      read_pos_ranksum_threshold: -20.0
+      inbreeding_coeff_threshold: -0.8
+      
+    quality_filters:
+      qual_threshold: 30.0
+      min_depth: 10
+      max_depth: 1000
+
+# Validation Settings
+validation:
+  metrics:
+    calculate_sensitivity: true
+    calculate_specificity: true
+    calculate_precision: true
+    calculate_f1_score: true
+    calculate_ti_tv_ratio: true
+    calculate_novelty_metrics: true
+    
+  ground_truth:
+    known_sites: []  # Will be populated with actual paths
+    dbsnp_path: ""
+    thousand_genomes_path: ""
+    
+  quality_assessment:
+    assess_variant_distribution: true
+    assess_quality_scores: true
+    assess_allele_frequencies: true
+    assess_depth_distribution: true
+
+# Performance Optimization Settings
+optimization:
+  memory_management:
+    dynamic_allocation: true
+    max_heap_size: "8g"
+    gc_optimization: true
+    
+  threading:
+    parallel_processing: true
+    optimal_thread_calculation: true
+    thread_pool_size: 4
+    
+  storage:
+    compression_level: 6
+    intermediate_cleanup: false
+    use_tmp_dir: true
+    
+  monitoring:
+    enable_performance_monitoring: true
+    log_resource_usage: true
+    generate_performance_reports: true
+
+# Error Handling Settings
+error_handling:
+  continue_on_error: false
+  max_retries: 3
+  retry_delay: 30
+  log_errors: true
+  create_error_reports: true
+  
+  validation:
+    validate_inputs: true
+    validate_outputs: true
+    check_file_integrity: true
+
+# Logging Settings
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file_logging: true
+  console_logging: true
+  log_file: "pipeline.log"
+  
+  performance_logging:
+    log_step_times: true
+    log_memory_usage: true
+    log_cpu_usage: true
+    log_disk_usage: true
+
+# Reporting Settings
+reporting:
+  generate_reports: true
+  report_format: "text"
+  include_plots: true
+  include_statistics: true
+  
+  reports:
+    - "pipeline_summary"
+    - "performance_report"
+    - "quality_metrics"
+    - "validation_results"
+    - "error_summary"
+
+# Advanced Settings
+advanced:
+  # GATK specific settings
+  gatk:
+    use_parallel: true
+    use_gvcf: true
+    use_haplotype_caller: true
+    use_ploidy_model: true
+    
+  # BWA specific settings
+  bwa:
+    use_mem_algorithm: true
+    optimize_for_accuracy: true
+    use_soft_clipping: true
+    
+  # Samtools specific settings
+  samtools:
+    use_multithreading: true
+    compression_level: 6
+    create_index: true
+
+# Environment Settings
+environment:
+  # System requirements
+  system:
+    min_memory_gb: 8
+    min_cpu_cores: 4
+    min_disk_space_gb: 50
+    
+  # Software versions
+  versions:
+    gatk: "4.2.0"
+    bwa: "0.7.17"
+    samtools: "1.12"
+    fastqc: "0.11.9"
+    cutadapt: "3.4"
+    trimmomatic: "0.39"
+    
+  # Dependencies
+  dependencies:
+    java: "1.8+"
+    python: "3.8+"
+    r: "4.0+"  # For plotting if needed
+
+# Quality Control Thresholds
+quality_control:
+  # FastQC thresholds
+  fastqc:
+    per_base_quality: 20
+    per_sequence_quality: 20
+    per_base_n_content: 5
+    sequence_length_distribution: true
+    gc_content: true
+    per_base_gc_content: true
+    per_sequence_gc_content: true
+    per_base_n_content: true
+    sequence_duplication_levels: true
+    overrepresented_sequences: true
+    adapter_content: true
+    kmer_content: true
+    
+  # Cutadapt thresholds
+  cutadapt:
+    min_quality: 20
+    min_length: 50
+    max_error_rate: 0.1
+    
+  # Trimmomatic thresholds
+  trimmomatic:
+    leading_quality: 3
+    trailing_quality: 3
+    sliding_window: "4:20"
+    min_length: 50
+
+# Validation Thresholds
+validation_thresholds:
+  # Quality score thresholds
+  quality_scores:
+    min_mean_quality: 20
+    min_median_quality: 25
+    max_low_quality_fraction: 0.1
+    
+  # Coverage thresholds
+  coverage:
+    min_mean_coverage: 10
+    min_coverage_10x: 0.8
+    min_coverage_30x: 0.5
+    max_coverage: 1000
+    
+  # Variant quality thresholds
+  variant_quality:
+    min_qual: 30
+    min_qd: 2.0
+    max_fs: 60.0
+    min_mq: 40.0
+    
+  # Accuracy thresholds
+  accuracy:
+    min_sensitivity: 0.9
+    min_specificity: 0.95
+    min_precision: 0.9
+    min_f1_score: 0.9
+    expected_ti_tv_ratio: 2.1  # For human genome 
