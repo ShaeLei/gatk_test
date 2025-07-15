@@ -16,11 +16,11 @@ from pathlib import Path
 from typing import Dict, List, Optional
 
 # Import pipeline modules
-from preprocessing import QualityControl, AdapterTrimming, QualityTrimming
-from alignment import BWAAlignment, SAMProcessing
-from postprocessing import Deduplication, BaseRecalibration
-from variant_calling import HaplotypeCaller, VariantFiltering
-from validation import ValidationMetrics, PerformanceMonitor
+from .preprocessing import QualityControl, AdapterTrimming, QualityTrimming
+from .alignment import BWAAlignment, SAMProcessing
+from .postprocessing import Deduplication, BaseRecalibration
+from .variant_calling import HaplotypeCaller, VariantFiltering
+from .validation import ValidationMetrics, PerformanceMonitor
 
 
 class VariantCallingPipeline:
